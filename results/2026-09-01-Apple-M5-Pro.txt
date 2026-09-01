@@ -1,0 +1,97 @@
+# 2026-09-01T19:39:29Z  macOS 26.5.2 (25F84)  Apple clang version 21.0.0 (clang-2100.3.23.3)
+# power: 'AC Power'
+
+== rtprobe ==
+device                          = Apple M5 Pro
+registryID                      = 4294968677
+hasUnifiedMemory                = YES
+recommendedMaxWorkingSetSize    = 17.76 GB
+maxThreadgroupMemoryLength      = 32768
+
+-- GPU families --
+  supportsFamily(Apple6 )        = YES
+  supportsFamily(Apple7 )        = YES
+  supportsFamily(Apple8 )        = YES
+  supportsFamily(Apple9 )        = YES
+  supportsFamily(Apple10)        = YES
+  supportsFamily(Mac2   )        = YES
+  supportsFamily(Metal3 )        = YES
+  supportsFamily(Metal4 )        = YES
+
+-- ray tracing --
+supportsRaytracing              = YES
+supportsRaytracingFromRender    = YES
+supportsPrimitiveMotionBlur     = YES
+supportsFunctionPointers        = YES
+supportsFunctionPointersFromRender = YES
+supportsShaderBarycentricCoordinates = YES
+
+-- MetalFX --
+MTLFXSpatialScaler supportsDevice           = YES
+MTLFXTemporalScaler supportsDevice          = YES
+MTLFXTemporalDenoisedScaler supportsDevice  = YES
+MTLFXFrameInterpolator supportsDevice       = YES
+
+-- acceleration structure sizing (triangle BLAS) --
+      1000 tris: AS=   0.101 MB  scratch=   0.049 MB  refitScratch=   0.000 MB  heapAlign=1024
+     10000 tris: AS=   1.008 MB  scratch=   0.507 MB  refitScratch=   0.000 MB  heapAlign=1024
+    100000 tris: AS=  10.455 MB  scratch=   5.526 MB  refitScratch=   0.000 MB  heapAlign=1024
+   1000000 tris: AS= 105.068 MB  scratch=  49.173 MB  refitScratch=   0.000 MB  heapAlign=1024
+
+argBufferTier                   = 1
+
+== rtbench 512 ==
+device=Apple M5 Pro  Apple10=1  supportsRaytracing=1  supportsRaytracingFromRender=1
+mesh: 263169 verts, 524288 triangles
+
+-- BLAS build, 524288 tris --
+  PreferFastIntersection : build  4.771 ms ( 109.9 Mtri/s) | AS   54.46 MB (108.9 B/tri) | scratch  30.76 MB | refitScratch   0.00 MB
+  PreferFastBuild        : build  3.569 ms ( 146.9 Mtri/s) | AS   54.46 MB (108.9 B/tri) | scratch  30.76 MB | refitScratch   0.00 MB
+  MinimizeMemory         : build  3.947 ms ( 132.8 Mtri/s) | AS   50.47 MB (100.9 B/tri) | scratch  29.47 MB | refitScratch   0.00 MB
+  Refit                  : build  3.589 ms ( 146.1 Mtri/s) | AS   54.73 MB (109.5 B/tri) | scratch  30.76 MB | refitScratch   0.00 MB
+                         : REFIT  0.656 ms  (5.5x cheaper than its own rebuild)
+  None (default)         : build  4.420 ms ( 118.6 Mtri/s) | AS   54.46 MB (108.9 B/tri) | scratch  30.76 MB | refitScratch   0.00 MB
+
+pipeline: maxThreadsPerThreadgroup=1024 threadExecutionWidth=32
+
+-- ray throughput, 1920x1080 = 2.07 Mpx --
+  CLOSEST-HIT primary (partial screen coverage) :  0.267 ms median ( 0.266 min) ->  7762.7 Mray/s | hit rate 19.0%
+  ANY-HIT     primary (partial screen coverage) :  0.276 ms median ( 0.275 min) ->  7499.5 Mray/s | hit rate 19.0%
+  CLOSEST-HIT interior, 100% hit rate           :  1.028 ms median ( 1.024 min) ->  2016.8 Mray/s | hit rate 100.0%
+  PRIMARY + 4 short AO any-hit rays             :  0.571 ms median ( 0.570 min) -> 18153.6 Mray/s | px with primary+AO hits 13.0%, mean AO occluders/px 0.19
+
+-- TLAS arms, interior 100%-hit incoherent rays, 1920x1080 --
+  TLAS x1  build  0.028 ms | AS    0.5 KB | scratch    0.4 KB
+  TLAS x1  intersector<triangle_data, instancing>       :  1.390 ms median ( 1.386 min) ->  1491.6 Mray/s | hit rate 100.0%
+  TLAS x1  intersection_query<triangle_data, instancing> :  1.681 ms median ( 1.675 min) ->  1233.7 Mray/s | hit rate 100.0%, next() candidates/ray 0.000
+  TLAS x16 build  0.058 ms | AS    3.7 KB | scratch    0.9 KB
+  TLAS x16 intersector<triangle_data, instancing>       :  1.391 ms median ( 1.385 min) ->  1491.1 Mray/s | hit rate 100.0%
+  TLAS x16 intersection_query<triangle_data, instancing> :  1.681 ms median ( 1.672 min) ->  1233.7 Mray/s | hit rate 100.0%, next() candidates/ray 0.000
+
+== rtbench 1024 ==
+device=Apple M5 Pro  Apple10=1  supportsRaytracing=1  supportsRaytracingFromRender=1
+mesh: 1050625 verts, 2097152 triangles
+
+-- BLAS build, 2097152 tris --
+  PreferFastIntersection : build 43.447 ms (  48.3 Mtri/s) | AS  220.34 MB (110.2 B/tri) | scratch 111.12 MB | refitScratch   0.00 MB
+  PreferFastBuild        : build 14.781 ms ( 141.9 Mtri/s) | AS  217.26 MB (108.6 B/tri) | scratch 122.66 MB | refitScratch   0.00 MB
+  MinimizeMemory         : build 16.914 ms ( 124.0 Mtri/s) | AS  201.10 MB (100.5 B/tri) | scratch 117.45 MB | refitScratch   0.00 MB
+  Refit                  : build 14.632 ms ( 143.3 Mtri/s) | AS  218.26 MB (109.1 B/tri) | scratch 122.66 MB | refitScratch   0.00 MB
+                         : REFIT  2.423 ms  (6.0x cheaper than its own rebuild)
+  None (default)         : build 18.080 ms ( 116.0 Mtri/s) | AS  217.26 MB (108.6 B/tri) | scratch 122.66 MB | refitScratch   0.00 MB
+
+pipeline: maxThreadsPerThreadgroup=1024 threadExecutionWidth=32
+
+-- ray throughput, 1920x1080 = 2.07 Mpx --
+  CLOSEST-HIT primary (partial screen coverage) :  0.279 ms median ( 0.277 min) ->  7438.9 Mray/s | hit rate 19.0%
+  ANY-HIT     primary (partial screen coverage) :  0.348 ms median ( 0.340 min) ->  5952.2 Mray/s | hit rate 19.0%
+  CLOSEST-HIT interior, 100% hit rate           :  1.749 ms median ( 1.716 min) ->  1185.8 Mray/s | hit rate 100.0%
+  PRIMARY + 4 short AO any-hit rays             :  0.663 ms median ( 0.660 min) -> 15646.9 Mray/s | px with primary+AO hits 13.0%, mean AO occluders/px 0.19
+
+-- TLAS arms, interior 100%-hit incoherent rays, 1920x1080 --
+  TLAS x1  build  0.027 ms | AS    0.5 KB | scratch    0.4 KB
+  TLAS x1  intersector<triangle_data, instancing>       :  1.826 ms median ( 1.807 min) ->  1135.3 Mray/s | hit rate 100.0%
+  TLAS x1  intersection_query<triangle_data, instancing> :  2.062 ms median ( 2.035 min) ->  1005.4 Mray/s | hit rate 100.0%, next() candidates/ray 0.000
+  TLAS x16 build  0.057 ms | AS    3.7 KB | scratch    0.9 KB
+  TLAS x16 intersector<triangle_data, instancing>       :  1.834 ms median ( 1.813 min) ->  1130.5 Mray/s | hit rate 100.0%
+  TLAS x16 intersection_query<triangle_data, instancing> :  2.064 ms median ( 2.044 min) ->  1004.4 Mray/s | hit rate 100.0%, next() candidates/ray 0.000
